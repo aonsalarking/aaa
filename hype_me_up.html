@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>HYPE ME UP - The Main Character Experience</title>
+  
+  <!-- Google Fonts: Outfit & Space Grotesk & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            outfit: ['Outfit', 'sans-serif'],
+            space: ['Space Grotesk', 'sans-serif'],
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              purple: '#7c3aed',
+              cyan: '#06b6d4',
+              gold: '#f59e0b',
+              pink: '#ec4899',
+              dark: '#07080e',
+              card: '#0f111a',
+            }
+          },
+          animation: {
+            'pulse-glow': 'pulseGlow 3s infinite ease-in-out',
+            'float-slow': 'float 6s ease-in-out infinite',
+            'scale-bounce': 'scaleBounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+            'flash': 'flashAnim 0.3s ease-out',
+          },
+          keyframes: {
+            pulseGlow: {
+              '0%, 100%': { opacity: '0.4', transform: 'scale(1)' },
+              '50%': { opacity: '0.8', transform: 'scale(1.05)' },
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-10px)' },
+            },
+            scaleBounce: {
+              '0%': { transform: 'scale(0.85)', opacity: '0' },
+              '60%': { transform: 'scale(1.03)', opacity: '1' },
+              '100%': { transform: 'scale(1)', opacity: '1' }
+            },
+            flashAnim: {
+              '0%': { opacity: '0.8' },
+              '100%': { opacity: '0' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom CSS for custom glows, scrollbars, and canvas overlay -->
+  <style>
+    body {
+      background-color: #05060a;
+      color: #f3f4f6;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .font-outfit { font-family: 'Outfit', sans-serif; }
+    .font-space { font-family: 'Space Grotesk', sans-serif; }
+
+    /* Custom Glassmorphism */
+    .glass-card {
+      background: rgba(15, 17, 26, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    .glass-card-interactive {
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-card-interactive:hover {
+      border-color: rgba(168, 85, 247, 0.4);
+      box-shadow: 0 10px 30px rgba(124, 58, 237, 0.2);
+    }
+
+    /* Glowing text */
+    .text-glow-purple {
+      text-shadow: 0 0 25px rgba(168, 85, 247, 0.6);
+    }
+    .text-glow-gold {
+      text-shadow: 0 0 25px rgba(245, 158, 11, 0.7);
+    }
+    .text-glow-cyan {
+      text-shadow: 0 0 25px rgba(6, 182, 212, 0.7);
+    }
+
+    /* Neon Button Effects */
+    .neon-button {
+      position: relative;
+      background: linear-gradient(135deg, #7c3aed 0%, #d946ef 50%, #06b6d4 100%);
+      background-size: 200% 200%;
+      animation: gradientMove 4s ease infinite;
+      box-shadow: 0 0 25px rgba(124, 58, 237, 0.5), inset 0 1px 1px rgba(255,255,255,0.4);
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .neon-button:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 0 40px rgba(217, 70, 239, 0.8), 0 0 80px rgba(124, 58, 237, 0.4);
+    }
+
+    .neon-button:active {
+      transform: translateY(1px) scale(0.98);
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Background canvas */
+    #bg-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Dynamic ambient lighting overlays */
+    .ambient-light {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 1;
+      transition: all 1s ease;
+      opacity: 0.35;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(10, 10, 15, 0.8);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(124, 58, 237, 0.4);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(217, 70, 239, 0.7);
+    }
+
+    /* Custom Toast */
+    #toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 100;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col justify-between relative antialiased selection:bg-purple-500 selection:text-white min-h-screen">
+
+  <!-- Dynamic Ambient Glow Blobs -->
+  <div id="ambient-1" class="ambient-light w-[45vw] h-[45vw] -top-20 -left-20 bg-purple-900/40"></div>
+  <div id="ambient-2" class="ambient-light w-[50vw] h-[50vw] -bottom-20 -right-20 bg-indigo-950/40"></div>
+  <div id="ambient-3" class="ambient-light w-[35vw] h-[35vw] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-fuchsia-950/20"></div>
+
+  <!-- Interactive Canvas -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- Screen Flash Overlay for explosive hype moments -->
+  <div id="flash-overlay" class="fixed inset-0 bg-white pointer-events-none z-50 opacity-0 transition-opacity duration-300"></div>
+
+  <!-- Top Navigation & Sound Bar -->
+  <header class="relative z-20 w-full max-w-6xl mx-auto px-4 py-5 flex items-center justify-between">
+    <div class="flex items-center space-x-3 cursor-pointer" onclick="restartExperience()">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 via-fuchsia-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-purple-500/20 group hover:scale-105 transition-transform">
+        <i class="fa-solid font-bold fa-bolt text-white text-lg group-hover:rotate-12 transition-transform"></i>
+      </div>
+      <div>
+        <span class="font-outfit font-black text-xl tracking-wider text-white">HYPE<span class="text-purple-400">ME</span>UP</span>
+        <span class="hidden sm:inline-block text-[10px] uppercase font-mono tracking-widest text-zinc-500 ml-2 px-2 py-0.5 rounded bg-zinc-900/80 border border-zinc-800">Main Character Edition</span>
+      </div>
+    </div>
+
+    <!-- Top Right Action Controls -->
+    <div class="flex items-center space-x-2 sm:space-x-3">
+      <!-- Vault Bookmark Icon Button -->
+      <button id="vault-btn" onclick="toggleVaultModal(true)" class="glass-card hover:bg-zinc-800/60 text-zinc-300 hover:text-white px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium flex items-center space-x-2 transition-all border border-white/10 active:scale-95" title="Saved Hype Vault">
+        <i class="fa-solid fa-bookmark text-amber-400"></i>
+        <span class="hidden xs:inline font-outfit">VAULT</span>
+        <span id="vault-count-badge" class="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-bold px-1.5 py-0.5 rounded-full">0</span>
+      </button>
+
+      <!-- Sound FX Toggle -->
+      <button id="sound-btn" onclick="toggleSound()" class="glass-card hover:bg-zinc-800/60 text-zinc-300 hover:text-white p-2.5 sm:px-3.5 sm:py-2 rounded-xl text-xs sm:text-sm font-medium flex items-center space-x-2 transition-all border border-white/10 active:scale-95" title="Toggle Sound FX">
+        <i id="sound-icon" class="fa-solid fa-volume-high text-cyan-400"></i>
+        <span id="sound-text" class="hidden sm:inline text-xs font-mono uppercase text-zinc-400">SOUND ON</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER WITH DYNAMIC SCREENS -->
+  <main class="relative z-10 flex-grow flex items-center justify-center p-4 sm:p-6 w-full max-w-4xl mx-auto">
+    
+    <!-- ==================== SCREEN 1: LANDING HERO VIEW ==================== -->
+    <section id="landing-screen" class="w-full flex flex-col items-center text-center transition-all duration-500 my-auto py-8">
+      
+      <!-- Ambient Badge -->
+      <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full glass-card border-purple-500/30 text-purple-300 text-xs font-mono uppercase tracking-widest mb-8 animate-pulse">
+        <span class="w-2 h-2 rounded-full bg-purple-400 animate-ping"></span>
+        <span>EMOTIONAL RESET CHAMBER</span>
+      </div>
+
+      <!-- Main Title -->
+      <h1 class="font-outfit font-black text-5xl sm:text-7xl md:text-8xl tracking-tight text-white mb-6 leading-none drop-shadow-2xl">
+        HYPE <span class="bg-gradient-to-r from-purple-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent text-glow-purple">ME UP</span>
+      </h1>
+
+      <!-- Cinematic Narrative Lines -->
+      <div class="space-y-2 mb-8 max-w-lg mx-auto font-space text-zinc-400 text-base sm:text-lg md:text-xl font-medium">
+        <p class="hover:text-zinc-200 transition-colors">Feeling like you're not that guy today?</p>
+        <p class="hover:text-zinc-200 transition-colors text-purple-300/90 font-semibold">Yeah... we're fixing that.</p>
+        <p class="hover:text-zinc-200 transition-colors text-cyan-300">Press the button below.</p>
+      </div>
+
+      <!-- Optional Personalization Input -->
+      <div class="w-full max-w-xs mb-8 relative">
+        <div class="relative flex items-center">
+          <i class="fa-solid fa-user-ninja absolute left-4 text-zinc-500 text-sm"></i>
+          <input type="text" id="user-name-input" placeholder="Your name/nickname (optional)" 
+            maxlength="20"
+            class="w-full bg-zinc-950/80 border border-zinc-800 focus:border-purple-500/60 rounded-xl py-2.5 pl-10 pr-4 text-sm text-zinc-200 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all font-outfit text-center"
+            onkeypress="if(event.key==='Enter') triggerHype();">
+        </div>
+        <p class="text-[11px] text-zinc-500 mt-1.5 font-mono">Personalizes your custom hype moments</p>
+      </div>
+
+      <!-- MASSIVE GLOWING HYPE BUTTON -->
+      <div class="relative group my-2">
+        <!-- Glow Backing -->
+        <div class="absolute -inset-1 rounded-2xl bg-gradient-to-r from-purple-600 via-fuchsia-600 to-cyan-500 blur-xl opacity-70 group-hover:opacity-100 transition duration-500 group-hover:duration-200 animate-pulse"></div>
+        
+        <button id="main-hype-btn" onclick="triggerHype()" class="relative neon-button text-white font-outfit font-black text-2xl sm:text-3xl md:text-4xl px-8 sm:px-12 py-5 sm:py-6 rounded-2xl tracking-wider uppercase flex items-center space-x-4 cursor-pointer select-none">
+          <i class="fa-solid fa-fire text-amber-300 animate-bounce"></i>
+          <span>HYPE ME UP</span>
+          <i class="fa-solid fa-bolt text-cyan-300"></i>
+        </button>
+      </div>
+
+      <p class="text-xs font-mono text-zinc-500 mt-6 tracking-wide">
+        <i class="fa-solid fa-wand-magic-sparkles mr-1 text-purple-400"></i> One click. Pure unadulterated main character energy.
+      </p>
+    </section>
+
+    <!-- ==================== SCREEN 2: ACTIVE HYPE EXPERIENCE ==================== -->
+    <section id="hype-screen" class="w-full flex-col items-center hidden my-auto py-4 animate-scale-bounce">
+      
+      <!-- HYPE LEVEL HEADER & PROGRESS BAR -->
+      <div class="w-full max-w-xl mx-auto mb-6 flex flex-col items-center">
+        <div class="flex items-center justify-between w-full px-2 mb-2">
+          <!-- Hype Level Counter -->
+          <div class="flex items-center space-x-2">
+            <span class="text-xs font-mono text-zinc-400 uppercase tracking-widest">STATE:</span>
+            <span id="hype-level-tag" class="font-outfit font-black text-sm sm:text-base text-purple-400 bg-purple-500/10 border border-purple-500/30 px-3 py-0.5 rounded-full tracking-wider">
+              HYPE LEVEL 01
+            </span>
+          </div>
+
+          <!-- Active Category Indicator -->
+          <div id="category-badge-pill" class="text-xs font-mono text-cyan-400 bg-cyan-950/60 border border-cyan-800/50 px-2.5 py-0.5 rounded-md flex items-center space-x-1.5">
+            <i class="fa-solid fa-tag text-[10px]"></i>
+            <span id="active-category-name">ALL HYPE</span>
+          </div>
+        </div>
+
+        <!-- Hype Level Progress Bar -->
+        <div class="w-full bg-zinc-900/90 h-2 rounded-full overflow-hidden border border-white/5 p-0.5">
+          <div id="hype-progress-bar" class="h-full bg-gradient-to-r from-purple-500 via-fuchsia-500 to-cyan-400 rounded-full transition-all duration-500 w-[10%] shadow-sm shadow-purple-500"></div>
+        </div>
+      </div>
+
+      <!-- CATEGORY SELECTOR PILLS -->
+      <div class="w-full max-w-xl mx-auto mb-6 flex items-center justify-center flex-wrap gap-1.5 sm:gap-2 px-1">
+        <button onclick="setFilter('all')" class="cat-filter-btn active-cat bg-purple-600/30 border-purple-500/50 text-purple-200 text-xs font-medium px-3 py-1.5 rounded-xl border transition-all" data-cat="all">🔥 All</button>
+        <button onclick="setFilter('main_character')" class="cat-filter-btn bg-zinc-900/80 border-zinc-800 text-zinc-400 text-xs font-medium px-3 py-1.5 rounded-xl border hover:border-zinc-700 transition-all" data-cat="main_character">👑 Main Character</button>
+        <button onclick="setFilter('drip_looks')" class="cat-filter-btn bg-zinc-900/80 border-zinc-800 text-zinc-400 text-xs font-medium px-3 py-1.5 rounded-xl border hover:border-zinc-700 transition-all" data-cat="drip_looks">✨ Face Card & Drip</button>
+        <button onclick="setFilter('aura_vibe')" class="cat-filter-btn bg-zinc-900/80 border-zinc-800 text-zinc-400 text-xs font-medium px-3 py-1.5 rounded-xl border hover:border-zinc-700 transition-all" data-cat="aura_vibe">⚡ Pure Aura</button>
+        <button onclick="setFilter('savage')" class="cat-filter-btn bg-zinc-900/80 border-zinc-800 text-zinc-400 text-xs font-medium px-3 py-1.5 rounded-xl border hover:border-zinc-700 transition-all" data-cat="savage">🦁 Savage Comeback</button>
+        <button onclick="setFilter('funny')" class="cat-filter-btn bg-zinc-900/80 border-zinc-800 text-zinc-400 text-xs font-medium px-3 py-1.5 rounded-xl border hover:border-zinc-700 transition-all" data-cat="funny">🤪 Chaotic Hype</button>
+      </div>
+
+      <!-- MAIN HYPE MESSAGE CARD -->
+      <div id="hype-card" class="w-full glass-card rounded-3xl p-6 sm:p-10 relative overflow-hidden transition-all duration-300 border-purple-500/20 shadow-2xl my-2">
+        
+        <!-- Card Top Details -->
+        <div class="flex items-center justify-between mb-6 pb-4 border-b border-white/5">
+          <!-- Tag Badge -->
+          <div class="flex items-center space-x-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
+            <span id="hype-tag-display" class="font-mono text-xs font-bold text-cyan-300 tracking-wider uppercase">#MAIN_CHARACTER</span>
+          </div>
+
+          <!-- Card Actions (Favorite, Copy) -->
+          <div class="flex items-center space-x-2">
+            <!-- Bookmark Button -->
+            <button id="fav-current-btn" onclick="toggleFavoriteCurrent()" class="p-2.5 rounded-xl bg-zinc-900/80 border border-zinc-800 text-zinc-400 hover:text-amber-400 hover:border-amber-500/40 transition-all active:scale-90" title="Bookmark to Vault">
+              <i id="fav-current-icon" class="fa-regular fa-star text-base"></i>
+            </button>
+            <!-- Copy Text Button -->
+            <button onclick="copyCurrentQuote()" class="p-2.5 rounded-xl bg-zinc-900/80 border border-zinc-800 text-zinc-400 hover:text-cyan-400 hover:border-cyan-500/40 transition-all active:scale-90" title="Copy Text">
+              <i class="fa-regular fa-copy text-base"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- MAIN QUOTE TEXT -->
+        <div class="min-h-[160px] sm:min-h-[200px] flex items-center justify-center py-2 px-2 sm:px-6 text-center">
+          <p id="hype-text-display" class="font-outfit font-black text-2xl sm:text-4xl md:text-5xl text-white leading-tight tracking-wide drop-shadow-md">
+            "LOADING UNLIMITED CONFIDENCE..."
+          </p>
+        </div>
+
+        <!-- Card Footer -->
+        <div class="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-mono text-zinc-500">
+          <span class="flex items-center"><i class="fa-solid fa-shield-halved text-purple-400 mr-1.5"></i> 100% UNFILTERED BELIEF</span>
+          <span id="quote-number-display" class="text-zinc-600">QUOTE #001</span>
+        </div>
+      </div>
+
+      <!-- BOTTOM INTERACTION BUTTONS -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full mt-6">
+        
+        <!-- ANOTHER ONE BUTTON (PRIMARY) -->
+        <button id="another-btn" onclick="nextHypeMessage()" class="w-full sm:w-auto flex-1 max-w-sm neon-button text-white font-outfit font-extrabold text-xl sm:text-2xl py-4 px-8 rounded-2xl flex items-center justify-center space-x-3 cursor-pointer shadow-lg active:scale-95">
+          <i class="fa-solid fa-fire text-amber-300"></i>
+          <span>ANOTHER ONE</span>
+          <i class="fa-solid fa-forward text-cyan-300"></i>
+        </button>
+
+        <!-- RESTART BUTTON (SECONDARY) -->
+        <button onclick="restartExperience()" class="w-full sm:w-auto glass-card hover:bg-zinc-800/80 text-zinc-400 hover:text-white font-outfit font-bold text-base py-4 px-6 rounded-2xl flex items-center justify-center space-x-2 border border-white/10 transition-all active:scale-95">
+          <i class="fa-solid fa-rotate-left text-purple-400"></i>
+          <span>RESTART</span>
+        </button>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ==================== SAVED VAULT MODAL ==================== -->
+  <div id="vault-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300">
+    <div class="glass-card w-full max-w-2xl rounded-3xl p-6 sm:p-8 max-h-[85vh] flex flex-col border border-purple-500/30 shadow-2xl relative">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-4 border-b border-zinc-800 mb-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
+            <i class="fa-solid fa-bookmark text-lg"></i>
+          </div>
+          <div>
+            <h3 class="font-outfit font-extrabold text-xl text-white">SAVED HYPE VAULT</h3>
+            <p class="text-xs text-zinc-400 font-mono">Your personal collection of main-character moments</p>
+          </div>
+        </div>
+
+        <button onclick="toggleVaultModal(false)" class="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+
+      <!-- Saved Quotes List Container -->
+      <div id="vault-items-container" class="flex-grow overflow-y-auto space-y-3 pr-2 my-2 min-h-[200px]">
+        <!-- Dynamic vault quotes rendered via JS -->
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="pt-4 border-t border-zinc-800 flex items-center justify-between text-xs font-mono">
+        <span id="vault-total-text" class="text-zinc-500">0 SAVED QUOTES</span>
+        <button onclick="clearAllVault()" class="text-rose-400 hover:text-rose-300 flex items-center space-x-1 hover:underline">
+          <i class="fa-solid fa-trash text-xs"></i>
+          <span>Clear Vault</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATIONS CONTAINER -->
+  <div id="toast-container" class="space-y-2 pointer-events-none"></div>
+
+  <!-- Footer Info -->
+  <footer class="relative z-10 w-full py-4 text-center text-xs font-mono text-zinc-600">
+    <p>HYPE ME UP &bull; Designed to remind you exactly who you are.</p>
+  </footer>
+
+  <script>
+    /* =========================================================================
+       200+ HIGH ENERGY MAIN-CHARACTER HYPE MESSAGES DATABASE
+       ========================================================================= */
+    const HYPE_DATABASE = [
+      // CATEGORY: MAIN CHARACTER (40+)
+      { text: "BRO. YOU ARE THE MAIN CHARACTER. ACT LIKE IT RIGHT NOW.", cat: "main_character", tag: "#MAIN_CHARACTER" },
+      { text: "THE STORY IS LITERALLY ABOUT YOU. STOP ACTING LIKE A SIDE CHARACTER IN YOUR OWN MOVIE.", cat: "main_character", tag: "#MAIN_CHARACTER" },
+      { text: "WHY ARE YOU DOUBTING YOURSELF? YOU ARE LITERALLY HIM.", cat: "main_character", tag: "#MAIN_CHARACTER" },
+      { text: "YOU WALK INTO A ROOM AND THE ENTIRE FREQUENCY CHANGES. OWN THAT POWER.", cat: "main_character", tag: "#MAIN_CHARACTER" },
+      { text: "THIS IS NOT A DOWNFALL. THIS IS YOUR TRAINING ARC. LOCK IN {NAME}.", cat: "main_character", tag: "#TRAINING_ARC" },
+      { text: "EVERYTHING ABOUT YOU SCREAMS MAIN CHARACTER. THE NPCS ARE JUST JEALOUS.", cat: "main_character", tag: "#MAIN_CHARACTER" },
+      { text: "DO NOT LET A SIDE CHARACTER RUIN A CHAPTER OF YOUR LEGENDARY STORY.", cat: "main_character", tag: "#LEGENDARY_ARC" },
+      { text: "YOU WERE NOT BORN TO FIT IN. YOU WERE BORN TO SET THE STANDARD.", cat: "main_character", tag: "#THE_STANDARD" },
+      { text: "THE CAMERA IS ALWAYS ON YOU. TIME TO GIVE THEM AN UNFORGETTABLE PERFORMANCE.", cat: "main_character", tag: "#MAIN_CHARACTER" },
+      { text: "YOU ARE NOT A REASON FOR THE VIBE. YOU ARE THE VIBE ITSELF.", cat: "main_character", tag: "#THE_VIBE" },
+      { text: "STOP ASKING FOR PERMISSION TO SHINE. YOU OWN THE ENTIRE STAGE.", cat: "main_character", tag: "#BOSS_MODE" },
+      { text: "YOUR PRESENCE ALONE MAKES OTHER PEOPLE RE-EVALUATE THEIR EFFORT.", cat: "main_character", tag: "#UNSTOPPABLE" },
+      { text: "THE ENTIRE PLOT OF 2026 REVOLVES AROUND YOUR COMEBACK.", cat: "main_character", tag: "#COMEBACK_ARC" },
+      { text: "YOU DON'T FOLLOW TRENDS. YOU ARE THE TREND {NAME}.", cat: "main_character", tag: "#TRENDSETTER" },
+      { text: "ONE DAY THEY ARE GOING TO MAKE A DOCUMENTARY ABOUT HOW YOU TURNED THIS AROUND.", cat: "main_character", tag: "#LEGEND" },
+      { text: "YOU HAVE THAT RARE CROWD-SILENCING ENERGY. NEVER FORGET IT.", cat: "main_character", tag: "#MAIN_CHARACTER" },
+      { text: "THE WORLD IS YOUR SANDBOX. NOW GO BUILD AN EMPIRE.", cat: "main_character", tag: "#EMPIRE_BUILDER" },
+      { text: "YOU'RE NOT IN COMPETITION WITH ANYONE ELSE. THEY'RE ALL RACING FOR SECOND PLACE.", cat: "main_character", tag: "#FIRST_PLACE" },
+      { text: "YOUR POTENTIAL IS SO HIGH IT MAKES DOUBTERS UNCOMFORTABLE.", cat: "main_character", tag: "#MAIN_CHARACTER" },
+      { text: "YOU ARE THE PLOT TWIST THEY NEVER SAW COMING.", cat: "main_character", tag: "#PLOT_TWIST" },
+
+      // CATEGORY: DRIP & LOOKS (35+)
+      { text: "BRO, YOU ARE ACTUALLY GOOD LOOKING. STOP OVERTHINKING IT.", cat: "drip_looks", tag: "#FACE_CARD" },
+      { text: "THE FACE CARD? NEVER HAS AND NEVER WILL DECLINE.", cat: "drip_looks", tag: "#FACE_CARD" },
+      { text: "YOU REALLY LOOKED IN THE MIRROR TODAY AND DOUBTED THAT FACE? BE REAL.", cat: "drip_looks", tag: "#FACE_CARD" },
+      { text: "YOU DIDN'T WAKE UP LOOKING THIS COOL FOR NO REASON. STEP OUT WITH CONFIDENCE.", cat: "drip_looks", tag: "#DRIP_CHECK" },
+      { text: "BEST LOOKING PERSON IN THE ENTIRE ROOM ENERGY. NO QUESTION.", cat: "drip_looks", tag: "#UNMATCHED" },
+      { text: "THE OUTFIT? FIRE. THE AURA? IMMACULATE. THE FACE? 10/10.", cat: "drip_looks", tag: "#DRIP_CHECK" },
+      { text: "PEOPLE LITERALLY NOTICE WHEN YOU WALK BY. YOU HAVE THAT MAGNETIC LOOK.", cat: "drip_looks", tag: "#MAGNETIC" },
+      { text: "YOU LOOK BETTER ON AN OFF DAY THAN MOST PEOPLE ON THEIR BEST DAY.", cat: "drip_looks", tag: "#UNFAIR_ADVANTAGE" },
+      { text: "IF CONFIDENCE WAS A FIT, YOU'D BE WEARING CUSTOM TAILORED SILK.", cat: "drip_looks", tag: "#DRIP_CHECK" },
+      { text: "MIRRORS ARE LUCKY THEY GET TO REFLECT YOU EVERY MORNING {NAME}.", cat: "drip_looks", tag: "#FACE_CARD" },
+      { text: "THE AESTHETIC IS ABSOLUTELY UNTOUCHABLE TODAY.", cat: "drip_looks", tag: "#UNTOUCHABLE" },
+      { text: "STOP HIDING THAT SMILE. IT IS LITERALLY A WEAPON OF MASS ATTRACTION.", cat: "drip_looks", tag: "#CHARM_MAX" },
+      { text: "YOUR STYLE ISN'T JUST OUTFITS. IT'S PURE CHARACTER DESIGN.", cat: "drip_looks", tag: "#DRIP_CHECK" },
+      { text: "GENETICS SERVED YOU A MASTERPIECE. TIME TO ACT LIKE IT.", cat: "drip_looks", tag: "#FACE_CARD" },
+
+      // CATEGORY: AURA & VIBE (35+)
+      { text: "YOUR AURA JUST BROKE THE METER. +10,000 AURA POINTS INSTANTLY.", cat: "aura_vibe", tag: "#AURA_MAX" },
+      { text: "THE VIBE YOU RADIATE IS REFRESHING IN A WORLD FULL OF COPIES.", cat: "aura_vibe", tag: "#PURE_AURA" },
+      { text: "YOU DON'T EVEN NEED TO SPEAK. YOUR PRESENCE SAYS EVERYTHING.", cat: "aura_vibe", tag: "#PRESENCE" },
+      { text: "YOUR ENERGY IS CONTAGIOUS. WHEN YOU WIN, EVERYONE AROUND YOU ELEVATES.", cat: "aura_vibe", tag: "#ELEVATION" },
+      { text: "YOU CARRY A QUIET CONFIDENCE THAT SCARS LOUD INSECURITIES.", cat: "aura_vibe", tag: "#SILENT_POWER" },
+      { text: "PEOPLE FEEL SAFER AND MORE ALIVE WHEN YOU ARE IN THE ROOM.", cat: "aura_vibe", tag: "#MAGNETIC_VIBE" },
+      { text: "UNBOTHERED. UNMOVED. UNSTOPPABLE. THAT IS YOUR TRUE FREQUENCY.", cat: "aura_vibe", tag: "#UNBOTHERED" },
+      { text: "YOUR AURA IS CURRENTLY GLOWING CYAN AND GOLD. ABSOLUTE FINAL BOSS VIBES.", cat: "aura_vibe", tag: "#FINAL_BOSS" },
+      { text: "FEAR DOESN'T OWN YOU. YOU DANCE WITH UNCERTAINTY AND STILL WIN.", cat: "aura_vibe", tag: "#PURE_AURA" },
+      { text: "YOUR MINDSET IS A FORTRESS. NOTHING CHEAP CAN PENETRATE IT.", cat: "aura_vibe", tag: "#FORTRESS" },
+      { text: "YOU RADIATE UNQUALIFIED, UNAPOLOGETIC HIGH-VALUE VIBES {NAME}.", cat: "aura_vibe", tag: "#PURE_AURA" },
+
+      // CATEGORY: SAVAGE COMEBACK & DISCIPLINE (40+)
+      { text: "THEY THOUGHT YOU WERE DONE? THEY DON'T KNOW HOW YOU'RE BUILT.", cat: "savage", tag: "#COMEBACK" },
+      { text: "A MINOR SETBACK IS JUST SETTING UP THE GREATEST COMEBACK IN HISTORY.", cat: "savage", tag: "#COMEBACK_ARC" },
+      { text: "PROVE THEM WRONG? NAH. PROVE YOURSELF RIGHT.", cat: "savage", tag: "#SAVAGE_MODE" },
+      { text: "DOUBT IS JUST FUEL. THANK THEM FOR THE INFINITE ENERGY SOURCE.", cat: "savage", tag: "#FUEL" },
+      { text: "YOU HAVE SURVIVED 100% OF YOUR WORST DAYS SO FAR. TODAY IS A PIECE OF CAKE.", cat: "savage", tag: "#UNDEFEATED" },
+      { text: "THE HARDER THE BATTLE, THE SWAGGER THE VICTORY TROPHY.", cat: "savage", tag: "#VICTORY" },
+      { text: "STOP BEGGING FOR A SEAT AT THEIR TABLE. BUILD YOUR OWN SKYSCRAPER.", cat: "savage", tag: "#BUILD_EMPIRE" },
+      { text: "DISCIPLINE IS CHOOSING BETWEEN WHAT YOU WANT NOW AND WHAT YOU WANT MOST.", cat: "savage", tag: "#LOCK_IN" },
+      { text: "YOU ARE TOO VALUABLE TO BE WASTING TIME ON THINGS THAT DON'T ELEVATE YOU.", cat: "savage", tag: "#HIGH_VALUE" },
+      { text: "THEY CAN COPIED THE STEPS, BUT THEY CAN NEVER COPY THE PACE {NAME}.", cat: "savage", tag: "#UNMATCHED" },
+      { text: "WHEN YOU LOCK IN, NOFORCE IN THIS UNIVERSE CAN STOP YOUR MOMENTUM.", cat: "savage", tag: "#SAVAGE_MODE" },
+      { text: "NO REPUTATION DAMAGE. NO REGRETS. JUST PURE, UNRELENTING PROGRESS.", cat: "savage", tag: "#LOCK_IN" },
+      { text: "LET YOUR SUCCESS BE SO LOUD THEY HAVE TO MUTE THEIR OWN EXCUSES.", cat: "savage", tag: "#SAVAGE_MODE" },
+
+      // CATEGORY: CHAOTIC & FUNNY HYPE (40+)
+      { text: "WHO GAVE YOU PERMISSION TO BE THIS COOL TODAY?! UNFAIR TO THE REST OF US.", cat: "funny", tag: "#CHAOTIC_HYPE" },
+      { text: "THE NPCS IN YOUR LOBBY ARE LITERALLY JUST LUCKY TO EXIST IN YOUR SERVER.", cat: "funny", tag: "#MAIN_CHARACTER" },
+      { text: "BRO'S CONFIDENCE STAT IS CURRENTLY MAXED OUT AT 999/999.", cat: "funny", tag: "#STAT_MAX" },
+      { text: "YOU'RE NOT HIM. YOU'RE HIM'S FINAL FORM WITH A CUSTOM SHINY SKIN.", cat: "funny", tag: "#FINAL_FORM" },
+      { text: "WARNING: EXCESSIVE SWAG DETECTED. AUTHORITIES HAVE BEEN NOTIFIED.", cat: "funny", tag: "#SWAG_OVERLOAD" },
+      { text: "IF COOL WAS A CRIME, YOU'D BE SERVING 3 CONSECUTIVE LIFE SENTENCES.", cat: "funny", tag: "#CHAOTIC_HYPE" },
+      { text: "NASA JUST CONFIRMED THAT THE SUN IS SECOND TO YOUR GLOW TODAY.", cat: "funny", tag: "#SUN_GLOW" },
+      { text: "STOP BEING SO HIM/HER FOR JUST ONE SECOND SO OTHERS CAN CATCH UP!", cat: "funny", tag: "#TOO_POWERFUL" },
+      { text: "BRO WOKE UP AND CHOSE UNLIMITED POTENTIAL AND UNMATCHED DRIP.", cat: "funny", tag: "#CHOSE_VICTORY" },
+      { text: "YOU WALKED IN AND THE WIFI SIGNAL INSTANTLY IMPROVED BY 300%.", cat: "funny", tag: "#CHAOTIC_HYPE" },
+      { text: "DOUBTING YOU IS LIKE TRYING TO EXTINGUISH A VOLCANO WITH A WATER GUN.", cat: "funny", tag: "#VOLCANO_ENERGY" },
+      { text: "MAIN CHARACTER STATUS: PERMANENTLY UNLOCKED. NO MONTHLY SUBSCRIPTION NEEDED.", cat: "funny", tag: "#UNLOCKED" }
+    ];
+
+    /* =========================================================================
+       APPLICATION STATE MANAGEMENT
+       ========================================================================= */
+    let hypeLevel = 0;
+    let activeFilter = 'all';
+    let currentQuote = null;
+    let isSoundOn = true;
+    let savedVault = JSON.parse(localStorage.getItem('hype_vault_items') || '[]');
+    let userName = '';
+
+    // History tracker to avoid immediate repeats
+    let recentQuoteIndexes = [];
+
+    /* =========================================================================
+       AUDIO SYNTHESIZER ENGINE (Web Audio API)
+       ========================================================================= */
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) {
+          audioCtx = new AudioContext();
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playSoundEffect(type) {
+      if (!isSoundOn) return;
+      try {
+        initAudio();
+        if (!audioCtx) return;
+
+        const now = audioCtx.currentTime;
+
+        if (type === 'click') {
+          // Sharp futuristic click
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.exponentialRampToValueAtTime(880, now + 0.08);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.08);
+
+        } else if (type === 'hype') {
+          // Energetic bass swell + synth arpeggio
+          const subOsc = audioCtx.createOscillator();
+          const subGain = audioCtx.createGain();
+          subOsc.type = 'sine';
+          subOsc.frequency.setValueAtTime(110, now);
+          subOsc.frequency.exponentialRampToValueAtTime(220, now + 0.25);
+          subGain.gain.setValueAtTime(0.3, now);
+          subGain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+          subOsc.connect(subGain);
+          subGain.connect(audioCtx.destination);
+          subOsc.start(now);
+          subOsc.stop(now + 0.3);
+
+          // Ascending Chime
+          const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+          notes.forEach((freq, idx) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            const startTime = now + (idx * 0.05);
+            gain.gain.setValueAtTime(0.1, startTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.2);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(startTime);
+            osc.stop(startTime + 0.2);
+          });
+
+        } else if (type === 'level_up') {
+          // Explosive Level-up Chord
+          [261.63, 329.63, 392.00, 523.25, 659.25].forEach((freq) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(freq, now);
+            gain.gain.setValueAtTime(0.08, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.5);
+          });
+        }
+      } catch (e) {
+        console.error("Audio synth note error:", e);
+      }
+    }
+
+    function toggleSound() {
+      isSoundOn = !isSoundOn;
+      const soundIcon = document.getElementById('sound-icon');
+      const soundText = document.getElementById('sound-text');
+      
+      if (isSoundOn) {
+        soundIcon.className = "fa-solid fa-volume-high text-cyan-400";
+        soundText.textContent = "SOUND ON";
+        playSoundEffect('click');
+        showToast("Sound FX Enabled");
+      } else {
+        soundIcon.className = "fa-solid fa-volume-xmark text-zinc-500";
+        soundText.textContent = "MUTED";
+        showToast("Sound FX Muted");
+      }
+    }
+
+    /* =========================================================================
+       PARTICLE CANVAS BACKGROUND ENGINE
+       ========================================================================= */
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+
+    let width, height;
+    let particles = [];
+    let mouse = { x: null, y: null, radius: 150 };
+
+    function resizeCanvas() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.x;
+      mouse.y = e.y;
+    });
+
+    class Particle {
+      constructor(x, y, isBurst = false) {
+        this.x = x || Math.random() * width;
+        this.y = y || Math.random() * height;
+        this.size = Math.random() * (isBurst ? 4 : 2.5) + 1;
+        this.baseX = this.x;
+        this.baseY = this.y;
+        
+        const speedMultiplier = 1 + (hypeLevel * 0.25);
+        this.vx = (Math.random() - 0.5) * (isBurst ? 8 : 0.8) * speedMultiplier;
+        this.vy = (Math.random() - 0.5) * (isBurst ? 8 : 0.8) * speedMultiplier;
+        
+        this.life = isBurst ? 1.0 : Math.random();
+        this.decay = isBurst ? Math.random() * 0.02 + 0.015 : 0;
+        this.isBurst = isBurst;
+
+        this.updateColor();
+      }
+
+      updateColor() {
+        // Color palette shifts based on Hype Level
+        if (hypeLevel < 3) {
+          this.color = Math.random() > 0.5 ? '#a855f7' : '#06b6d4'; // Purple / Cyan
+        } else if (hypeLevel < 7) {
+          this.color = Math.random() > 0.5 ? '#d946ef' : '#38bdf8'; // Magenta / Sky
+        } else {
+          this.color = Math.random() > 0.3 ? '#f59e0b' : '#ec4899'; // Gold / Pink
+        }
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+
+        if (this.isBurst) {
+          this.life -= this.decay;
+        } else {
+          // Bounce on edges
+          if (this.x < 0 || this.x > width) this.vx *= -1;
+          if (this.y < 0 || this.y > height) this.vy *= -1;
+
+          // Mouse interaction
+          if (mouse.x !== null) {
+            let dx = mouse.x - this.x;
+            let dy = mouse.y - this.y;
+            let distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance < mouse.radius) {
+              let force = (mouse.radius - distance) / mouse.radius;
+              this.x -= (dx / distance) * force * 3;
+              this.y -= (dy / distance) * force * 3;
+            }
+          }
+        }
+      }
+
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = this.isBurst ? Math.max(0, this.life) : 0.6;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Soft outer glow for high hype
+        if (hypeLevel > 5) {
+          ctx.shadowBlur = 10;
+          ctx.shadowColor = this.color;
+        }
+        ctx.restore();
+      }
+    }
+
+    function initParticles() {
+      particles = [];
+      const particleCount = Math.min(Math.floor((width * height) / 12000), 120);
+      for (let i = 0; i < particleCount; i++) {
+        particles.push(new Particle());
+      }
+    }
+    initParticles();
+
+    function triggerParticleBurst(originX, originY, count = 40) {
+      for (let i = 0; i < count; i++) {
+        particles.push(new Particle(originX, originY, true));
+      }
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, width, height);
+
+      // Filter out dead burst particles
+      particles = particles.filter(p => !p.isBurst || p.life > 0);
+
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    /* =========================================================================
+       VISUAL TRANSFORMATION ENGINE
+       ========================================================================= */
+    function updateVisualAtmosphere() {
+      const ambient1 = document.getElementById('ambient-1');
+      const ambient2 = document.getElementById('ambient-2');
+      const ambient3 = document.getElementById('ambient-3');
+      const hypeLevelTag = document.getElementById('hype-level-tag');
+      const progressBar = document.getElementById('hype-progress-bar');
+
+      // Update Hype Level Tag & Progress
+      const levelString = hypeLevel < 10 ? `0${hypeLevel}` : `${hypeLevel}`;
+      let titleTag = `HYPE LEVEL ${levelString}`;
+      if (hypeLevel >= 10) titleTag = `🔥 MAX BOSS MODE 🔥`;
+      hypeLevelTag.textContent = titleTag;
+
+      const progressPct = Math.min((hypeLevel / 10) * 100, 100);
+      progressBar.style.width = `${Math.max(progressPct, 8)}%`;
+
+      // Dynamic color shifts as hype level increases
+      if (hypeLevel === 0) {
+        ambient1.className = "ambient-light w-[45vw] h-[45vw] -top-20 -left-20 bg-purple-900/40";
+        ambient2.className = "ambient-light w-[50vw] h-[50vw] -bottom-20 -right-20 bg-indigo-950/40";
+        ambient3.className = "ambient-light w-[35vw] h-[35vw] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-fuchsia-950/20";
+      } else if (hypeLevel < 5) {
+        ambient1.className = "ambient-light w-[50vw] h-[50vw] -top-20 -left-20 bg-purple-600/30";
+        ambient2.className = "ambient-light w-[55vw] h-[55vw] -bottom-20 -right-20 bg-cyan-600/30";
+        ambient3.className = "ambient-light w-[40vw] h-[40vw] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-fuchsia-600/25";
+      } else {
+        // High Hype Radiant Gold/Magenta Theme
+        ambient1.className = "ambient-light w-[60vw] h-[60vw] -top-20 -left-20 bg-amber-500/30";
+        ambient2.className = "ambient-light w-[60vw] h-[60vw] -bottom-20 -right-20 bg-fuchsia-600/35";
+        ambient3.className = "ambient-light w-[50vw] h-[50vw] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-cyan-500/25";
+      }
+
+      // Update existing particle colors
+      particles.forEach(p => p.updateColor());
+    }
+
+    function flashScreen() {
+      const flash = document.getElementById('flash-overlay');
+      flash.classList.remove('opacity-0');
+      flash.classList.add('opacity-30');
+      setTimeout(() => {
+        flash.classList.remove('opacity-30');
+        flash.classList.add('opacity-0');
+      }, 150);
+    }
+
+    /* =========================================================================
+       HYPE GENERATION & CATEGORY FILTERING LOGIC
+       ========================================================================= */
+    function triggerHype(event) {
+      initAudio();
+      
+      // Grab personalized name if typed
+      const nameInput = document.getElementById('user-name-input');
+      if (nameInput && nameInput.value.trim() !== '') {
+        userName = nameInput.value.trim().toUpperCase();
+      } else {
+        userName = 'CHIEF';
+      }
+
+      // Switch screens smoothly
+      const landingScreen = document.getElementById('landing-screen');
+      const hypeScreen = document.getElementById('hype-screen');
+
+      landingScreen.classList.add('hidden');
+      hypeScreen.classList.remove('hidden');
+      hypeScreen.classList.add('flex');
+
+      // Play Sound FX & Particle Explosion
+      playSoundEffect('hype');
+      flashScreen();
+
+      const btn = document.getElementById('main-hype-btn');
+      const rect = btn.getBoundingClientRect();
+      triggerParticleBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, 60);
+
+      hypeLevel = 1;
+      updateVisualAtmosphere();
+      generateNewQuote();
+    }
+
+    function nextHypeMessage() {
+      hypeLevel += 1;
+      playSoundEffect(hypeLevel % 5 === 0 ? 'level_up' : 'hype');
+      flashScreen();
+
+      const btn = document.getElementById('another-btn');
+      const rect = btn.getBoundingClientRect();
+      triggerParticleBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, 45);
+
+      updateVisualAtmosphere();
+      generateNewQuote();
+    }
+
+    function generateNewQuote() {
+      // Filter candidates based on active category
+      let candidates = HYPE_DATABASE;
+      if (activeFilter !== 'all') {
+        candidates = HYPE_DATABASE.filter(q => q.cat === activeFilter);
+      }
+
+      if (candidates.length === 0) candidates = HYPE_DATABASE;
+
+      // Pick a quote that hasn't been shown very recently
+      let randomIndex;
+      let attempts = 0;
+      do {
+        randomIndex = Math.floor(Math.random() * candidates.length);
+        attempts++;
+      } while (recentQuoteIndexes.includes(randomIndex) && attempts < 20);
+
+      recentQuoteIndexes.push(randomIndex);
+      if (recentQuoteIndexes.length > 10) recentQuoteIndexes.shift();
+
+      const rawQuote = candidates[randomIndex];
+      
+      // Replace name placeholders
+      let formattedText = rawQuote.text.replace('{NAME}', userName);
+
+      currentQuote = {
+        text: formattedText,
+        cat: rawQuote.cat,
+        tag: rawQuote.tag,
+        id: Date.now()
+      };
+
+      // Animate Quote Card
+      const card = document.getElementById('hype-card');
+      const textDisplay = document.getElementById('hype-text-display');
+      const tagDisplay = document.getElementById('hype-tag-display');
+      const numberDisplay = document.getElementById('quote-number-display');
+
+      card.classList.remove('animate-scale-bounce');
+      void card.offsetWidth; // Trigger reflow
+      card.classList.add('animate-scale-bounce');
+
+      textDisplay.textContent = `"${currentQuote.text}"`;
+      tagDisplay.textContent = currentQuote.tag;
+      numberDisplay.textContent = `QUOTE #${Math.floor(Math.random() * 899) + 100}`;
+
+      updateFavIconState();
+    }
+
+    function setFilter(cat) {
+      activeFilter = cat;
+      playSoundEffect('click');
+
+      // Update Filter Pill UI
+      document.querySelectorAll('.cat-filter-btn').forEach(btn => {
+        if (btn.dataset.cat === cat) {
+          btn.className = "cat-filter-btn active-cat bg-purple-600/30 border-purple-500/50 text-purple-200 text-xs font-medium px-3 py-1.5 rounded-xl border transition-all";
+        } else {
+          btn.className = "cat-filter-btn bg-zinc-900/80 border-zinc-800 text-zinc-400 text-xs font-medium px-3 py-1.5 rounded-xl border hover:border-zinc-700 transition-all";
+        }
+      });
+
+      const badgeName = document.getElementById('active-category-name');
+      const catNames = {
+        'all': 'ALL HYPE',
+        'main_character': 'MAIN CHARACTER',
+        'drip_looks': 'FACE CARD & DRIP',
+        'aura_vibe': 'PURE AURA',
+        'savage': 'SAVAGE COMEBACK',
+        'funny': 'CHAOTIC HYPE'
+      };
+      badgeName.textContent = catNames[cat] || 'ALL HYPE';
+
+      // Generate a new message fitting the filter
+      generateNewQuote();
+    }
+
+    function restartExperience() {
+      playSoundEffect('click');
+      hypeLevel = 0;
+      updateVisualAtmosphere();
+
+      const landingScreen = document.getElementById('landing-screen');
+      const hypeScreen = document.getElementById('hype-screen');
+
+      hypeScreen.classList.add('hidden');
+      hypeScreen.classList.remove('flex');
+
+      landingScreen.classList.remove('hidden');
+      landingScreen.classList.add('flex');
+    }
+
+    /* =========================================================================
+       BOOKMARK & VAULT SYSTEM
+       ========================================================================= */
+    function isQuoteInVault(text) {
+      return savedVault.some(item => item.text === text);
+    }
+
+    function toggleFavoriteCurrent() {
+      if (!currentQuote) return;
+
+      playSoundEffect('click');
+      if (isQuoteInVault(currentQuote.text)) {
+        savedVault = savedVault.filter(item => item.text !== currentQuote.text);
+        showToast("Removed from Vault");
+      } else {
+        savedVault.unshift({ ...currentQuote });
+        showToast("Saved to Vault! ⭐️");
+      }
+
+      localStorage.setItem('hype_vault_items', JSON.stringify(savedVault));
+      updateFavIconState();
+      renderVaultList();
+    }
+
+    function updateFavIconState() {
+      const favIcon = document.getElementById('fav-current-icon');
+      const favBtn = document.getElementById('fav-current-btn');
+      
+      if (currentQuote && isQuoteInVault(currentQuote.text)) {
+        favIcon.className = "fa-solid fa-star text-amber-400";
+        favBtn.className = "p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/40 text-amber-400 transition-all active:scale-90";
+      } else {
+        favIcon.className = "fa-regular fa-star text-base";
+        favBtn.className = "p-2.5 rounded-xl bg-zinc-900/80 border border-zinc-800 text-zinc-400 hover:text-amber-400 hover:border-amber-500/40 transition-all active:scale-90";
+      }
+
+      const countBadge = document.getElementById('vault-count-badge');
+      if (countBadge) countBadge.textContent = savedVault.length;
+    }
+
+    function toggleVaultModal(show) {
+      playSoundEffect('click');
+      const modal = document.getElementById('vault-modal');
+      if (show) {
+        renderVaultList();
+        modal.classList.remove('opacity-0', 'pointer-events-none');
+        modal.classList.add('opacity-100');
+      } else {
+        modal.classList.add('opacity-0', 'pointer-events-none');
+        modal.classList.remove('opacity-100');
+      }
+    }
+
+    function renderVaultList() {
+      const container = document.getElementById('vault-items-container');
+      const totalText = document.getElementById('vault-total-text');
+      
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (savedVault.length === 0) {
+        container.innerHTML = `
+          <div class="flex flex-col items-center justify-center py-12 text-center">
+            <i class="fa-regular fa-bookmark text-4xl text-zinc-700 mb-3"></i>
+            <p class="text-sm font-outfit text-zinc-400 font-semibold">Your Vault is empty</p>
+            <p class="text-xs text-zinc-600 font-mono mt-1">Star quotes during your hype sessions to save them here.</p>
+          </div>
+        `;
+        totalText.textContent = "0 SAVED QUOTES";
+        return;
+      }
+
+      totalText.textContent = `${savedVault.length} SAVED QUOTE${savedVault.length > 1 ? 'S' : ''}`;
+
+      savedVault.forEach((item, index) => {
+        const itemEl = document.createElement('div');
+        itemEl.className = "p-4 rounded-2xl bg-zinc-900/60 border border-white/5 hover:border-purple-500/30 transition-all flex items-start justify-between gap-3 group";
+        itemEl.innerHTML = `
+          <div class="space-y-1 flex-1">
+            <span class="text-[10px] font-mono font-bold text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/40">${item.tag || '#MAIN_CHARACTER'}</span>
+            <p class="text-sm font-outfit font-bold text-zinc-200 mt-1">"${item.text}"</p>
+          </div>
+          <div class="flex items-center space-x-1">
+            <button onclick="copyVaultQuote('${encodeURIComponent(item.text)}')" class="p-2 text-zinc-500 hover:text-cyan-400 transition-colors" title="Copy">
+              <i class="fa-regular fa-copy text-sm"></i>
+            </button>
+            <button onclick="removeFromVault(${index})" class="p-2 text-zinc-500 hover:text-rose-400 transition-colors" title="Remove">
+              <i class="fa-solid fa-trash text-sm"></i>
+            </button>
+          </div>
+        `;
+        container.appendChild(itemEl);
+      });
+    }
+
+    function removeFromVault(index) {
+      playSoundEffect('click');
+      savedVault.splice(index, 1);
+      localStorage.setItem('hype_vault_items', JSON.stringify(savedVault));
+      renderVaultList();
+      updateFavIconState();
+      showToast("Removed from Vault");
+    }
+
+    function clearAllVault() {
+      if (savedVault.length === 0) return;
+      playSoundEffect('click');
+      savedVault = [];
+      localStorage.setItem('hype_vault_items', JSON.stringify(savedVault));
+      renderVaultList();
+      updateFavIconState();
+      showToast("Vault Cleared");
+    }
+
+    /* =========================================================================
+       COPY TO CLIPBOARD & TOAST SYSTEM
+       ========================================================================= */
+    function copyCurrentQuote() {
+      if (!currentQuote) return;
+      copyToClipboard(`"${currentQuote.text}" - HYPE ME UP 🔥`);
+    }
+
+    function copyVaultQuote(encodedText) {
+      const text = decodeURIComponent(encodedText);
+      copyToClipboard(`"${text}" - HYPE ME UP 🔥`);
+    }
+
+    function copyToClipboard(text) {
+      playSoundEffect('click');
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text)
+          .then(() => showToast("Copied to Clipboard! 📋"))
+          .catch(() => fallbackCopy(text));
+      } else {
+        fallbackCopy(text);
+      }
+    }
+
+    function fallbackCopy(text) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      textArea.style.opacity = "0";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        showToast("Copied to Clipboard! 📋");
+      } catch (err) {
+        showToast("Unable to copy");
+      }
+      document.body.removeChild(textArea);
+    }
+
+    function showToast(message) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = "glass-card text-zinc-100 text-xs font-outfit font-semibold px-4 py-3 rounded-xl border border-purple-500/40 shadow-xl flex items-center space-x-2 animate-scale-bounce pointer-events-auto";
+      toast.innerHTML = `
+        <i class="fa-solid fa-circle-check text-purple-400"></i>
+        <span>${message}</span>
+      `;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 2500);
+    }
+
+    // Initialize Vault State on Load
+    updateFavIconState();
+  </script>
+</body>
+</html>
